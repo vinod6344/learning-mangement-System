@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { signOut } from "next-auth/react"
+import ProfileDropdown from "./ProfileDropdown"
 
 interface NavbarProps {
   user: {
@@ -38,16 +38,7 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">{user.name}</span>
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-              {user.role}
-            </span>
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="text-sm text-red-600 hover:text-red-800"
-            >
-              Sign out
-            </button>
+            <ProfileDropdown />
           </div>
         </div>
       </div>

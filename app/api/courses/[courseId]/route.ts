@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -18,7 +18,7 @@ export async function DELETE(
       return NextResponse.json({ message: "Only instructors can delete courses" }, { status: 403 })
     }
 
-    const { courseId } = params
+    const { courseId } = await params
 
     const course = await prisma.course.findUnique({
       where: { id: courseId }
