@@ -21,8 +21,9 @@ export default function ChatWidget() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [conversationHistory, setConversationHistory] = useState<Array<{ role: string; content: string }>>([])
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!inputValue.trim()) return
@@ -39,18 +40,50 @@ export default function ChatWidget() {
     setInputValue('')
     setIsTyping(true)
 
-    // Generate intelligent response
-    setTimeout(() => {
-      const botResponse = generateProgrammingResponse(inputValue)
-      const botMessage: Message = {
+    try {
+      // Call Hugging Face API
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: inputValue,
+          conversationHistory
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Add bot response
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: data.reply,
+          sender: 'bot',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, botMessage])
+        
+        // Update conversation history
+        setConversationHistory(prev => [
+          ...prev,
+          { role: 'user', content: inputValue },
+          { role: 'assistant', content: data.reply }
+        ])
+      } else {
+        throw new Error(data.error || 'Failed to get response')
+      }
+    } catch (error) {
+      console.error('Chat error:', error)
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: botResponse,
+        text: 'Sorry, I encountered an error. Please make sure you have set up your Hugging Face API key in the .env file.',
         sender: 'bot',
         timestamp: new Date()
       }
-      setMessages(prev => [...prev, botMessage])
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   function generateProgrammingResponse(userInput: string): string {
