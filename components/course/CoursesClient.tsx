@@ -111,6 +111,17 @@ export default function CoursesClient({ courses, isInstructor, currentUserId }: 
                   <p className="text-sm text-gray-500 mb-4">
                     Instructor: {course.instructor.name}
                   </p>
+                  <div className="flex items-center gap-2 mb-4">
+                    {course.price && course.price > 0 ? (
+                      <span className="text-green-700 font-semibold bg-green-50 px-2 py-1 rounded text-sm">
+                        ${course.price}
+                      </span>
+                    ) : (
+                      <span className="text-green-700 font-semibold bg-green-50 px-2 py-1 rounded text-sm">
+                        FREE
+                      </span>
+                    )}
+                  </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">{lessonsCount} lessons</span>
 
