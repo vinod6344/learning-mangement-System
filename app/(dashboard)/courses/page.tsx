@@ -36,6 +36,10 @@ export default async function CoursesPage() {
     sections: course.sections.map((section) => ({
       ...section,
       lessons: section.lessons.map((lesson) => ({ ...lesson }))
+    })),
+    enrollments: course.enrollments.map((enrollment) => ({
+      ...enrollment,
+      enrolledAt: enrollment.enrolledAt.toISOString()
     }))
   }))
 
