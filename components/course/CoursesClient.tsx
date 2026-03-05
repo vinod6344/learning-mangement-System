@@ -114,10 +114,18 @@ export default function CoursesClient({ courses, isInstructor, currentUserId }: 
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">{lessonsCount} lessons</span>
 
-                    {/* Instructor: show Delete for own courses */}
+                    {/* Instructor: show Edit and Delete for own courses */}
                     {isInstructor ? (
                       isOwner ? (
-                        <DeleteCourseButton courseId={course.id} />
+                        <div className="flex gap-2">
+                          <Link
+                            href={`/courses/${course.id}/edit`}
+                            className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700"
+                          >
+                            Edit
+                          </Link>
+                          <DeleteCourseButton courseId={course.id} />
+                        </div>
                       ) : (
                         <span className="text-xs text-gray-400 italic">Not your course</span>
                       )

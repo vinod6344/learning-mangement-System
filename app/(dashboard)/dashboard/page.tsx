@@ -93,7 +93,13 @@ export default async function DashboardPage() {
                     <p className="text-sm text-gray-500 mb-4">
                       {lessonsCount} lessons &bull; {course.enrollments.length} students enrolled
                     </p>
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
+                      <Link
+                        href={`/courses/${course.id}/edit`}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+                      >
+                        Edit Content
+                      </Link>
                       <DeleteCourseButton courseId={course.id} />
                     </div>
                   </div>
