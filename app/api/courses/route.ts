@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Only instructors can create courses" }, { status: 403 })
     }
 
-    const { title, description, category, thumbnail } = await req.json()
+    const { title, description, category, thumbnail, price } = await req.json()
 
     if (!title || !description || !category) {
       return NextResponse.json({ message: "Title, description and category are required" }, { status: 400 })
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
         description,
         category,
         thumbnail: thumbnail || null,
+        price: price || 0,
         instructorId: session.user.id
       }
     })

@@ -2,45 +2,35 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import EnrollmentModal from "./EnrollmentModal"
 
 interface EnrollButtonProps {
   courseId: string
+  courseTitle?: string
+  price?: number | null
 }
 
-export default function EnrollButton({ courseId }: EnrollButtonProps) {
+export default function EnrollButton({ courseId, courseTitle = "", price = null }: EnrollButtonProps) {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-
-  async function handleEnroll() {
-    setLoading(true)
-    try {
-      const res = await fetch("/api/enroll", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId })
-      })
-
-      if (res.ok) {
-        router.refresh()
-        router.push(`/learn/${courseId}`)
-      } else {
-        const data = await res.json()
-        alert(data.message || "Failed to enroll")
-      }
-    } catch (error) {
-      alert("Something went wrong")
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [showModal, setShowModal] = useState(false)
 
   return (
-    <button
-      onClick={handleEnroll}
-      disabled={loading}
-      className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 disabled:opacity-50"
-    >
-      {loading ? "Enrolling..." : "Enroll Now"}
-    </button>
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+      >
+        {price && price > 0 ? `Enroll - $${price}` : "Enroll Now"}
+      </button>
+
+      {showModal && (
+        <EnrollmentModal
+          courseId={courseId}
+          courseTitle={courseTitle}
+          price={price}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+    </>
   )
 }

@@ -57,7 +57,7 @@ export default function CoursesClient({ courses, isInstructor, currentUserId }: 
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          {isInstructor ? "Manage Courses" : "Browse Courses"}
+          {isInstructor ? "All Courses" : "Browse Courses"}
         </h1>
         {isInstructor && (
           <button
@@ -114,7 +114,7 @@ export default function CoursesClient({ courses, isInstructor, currentUserId }: 
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">{lessonsCount} lessons</span>
 
-                    {/* Instructor: show Edit and Delete for own courses */}
+                    {/* Instructor: show Edit/Delete for own courses, View for others */}
                     {isInstructor ? (
                       isOwner ? (
                         <div className="flex gap-2">
@@ -127,7 +127,10 @@ export default function CoursesClient({ courses, isInstructor, currentUserId }: 
                           <DeleteCourseButton courseId={course.id} />
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400 italic">Not your course</span>
+                        /* Show course info but no edit access */
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                          Created by {course.instructor.name}
+                        </span>
                       )
                     ) : (
                       /* Student: Enroll or Continue */
@@ -139,8 +142,13 @@ export default function CoursesClient({ courses, isInstructor, currentUserId }: 
                           Continue
                         </Link>
                       ) : (
-                        <EnrollButton courseId={course.id} />
+                        <EnrollButton 
+                          courseId={course.id}
+                          courseTitle={course.title}
+                          price={course.price}
+                        />
                       )
+
                     )}
                   </div>
                 </div>

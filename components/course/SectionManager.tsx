@@ -32,12 +32,14 @@ export default function SectionManager({ courseId, initialSections }: SectionMan
   const [newSectionTitle, setNewSectionTitle] = useState("")
   const [loading, setLoading] = useState(false)
   const [expandedSection, setExpandedSection] = useState<number | null>(null)
+  const [successMessage, setSuccessMessage] = useState("")
 
   async function handleAddSection(e: React.FormEvent) {
     e.preventDefault()
     if (!newSectionTitle.trim()) return
 
     setLoading(true)
+    setSuccessMessage("")
     try {
       const res = await fetch(`/api/courses/${courseId}/sections`, {
         method: "POST",
@@ -50,7 +52,11 @@ export default function SectionManager({ courseId, initialSections }: SectionMan
       if (res.ok) {
         setSections([...sections, data.section])
         setNewSectionTitle("")
-        router.refresh()
+        setSuccessMessage("Section added successfully! Click on it to add lessons.")
+        // Don't refresh immediately - let user see the success message
+        setTimeout(() => {
+          router.refresh()
+        }, 2000)
       } else {
         alert(data.message || "Failed to add section")
       }
@@ -63,6 +69,12 @@ export default function SectionManager({ courseId, initialSections }: SectionMan
 
   return (
     <div className="space-y-6">
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md text-sm">
+          {successMessage}
+        </div>
+      )}
+
       <form onSubmit={handleAddSection} className="flex gap-3">
         <input
           type="text"
@@ -85,44 +97,49 @@ export default function SectionManager({ courseId, initialSections }: SectionMan
           No sections yet. Add your first section above.
         </div>
       ) : (
-        <div className="space-y-4">
-          {sections.map((section, index) => (
-            <div key={section.id} className="border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
-                    Section {index + 1}
-                  </span>
-                  <span className="font-medium text-gray-900">{section.title}</span>
-                  <span className="text-sm text-gray-500">
-                    ({section.lessons.length} lessons)
-                  </span>
-                </div>
-                <svg
-                  className={`w-5 h-5 text-gray-400 transform transition-transform ${
-                    expandedSection === section.id ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-3">
+            {sections.length} section{sections.length !== 1 ? 's' : ''} found:
+          </p>
+          <div className="space-y-4">
+            {sections.map((section, index) => (
+              <div key={section.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 text-left"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                  <div className="flex items-center gap-3">
+                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                      Section {index + 1}
+                    </span>
+                    <span className="font-medium text-gray-900">{section.title}</span>
+                    <span className="text-sm text-gray-500">
+                      ({section.lessons.length} lessons)
+                    </span>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 text-gray-400 transform transition-transform ${
+                      expandedSection === section.id ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-              {expandedSection === section.id && (
-                <div className="p-4 bg-white">
-                  <LessonManager
-                    sectionId={section.id}
-                    initialLessons={section.lessons}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+                {expandedSection === section.id && (
+                  <div className="p-4 bg-white">
+                    <LessonManager
+                      sectionId={section.id}
+                      initialLessons={section.lessons}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
