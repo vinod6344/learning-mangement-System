@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
     // Call Hugging Face Chat Completion API
     const response = await hf.chatCompletion({
-      model: "mistralai/Mistral-7B-Instruct-v0.2",
+      model: "meta-llama/Meta-Llama-3-8B-Instruct",  // More reliable model
       messages: messages,
       max_tokens: 500,
       temperature: 0.7
