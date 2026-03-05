@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("STUDENT")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  courses      Course[]      @relation("InstructorCourses")
+  enrollments  Enrollment[]
+  progress     Progress[]
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  thumbnail   String?
+  category    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  instructorId String
+  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  sections     Section[]
+  enrollments  Enrollment[]
+}
+
+model Section {
+  id    Int    @id @default(autoincrement())
+  title String
+  order Int
+
+  // Relations
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons  Lesson[]
+}
+
+model Lesson {
+  id        String  @id @default(uuid())
+  title     String
+  order     Int
+  youtubeUrl String
+  duration  String?
+
+  // Relations
+  sectionId Int
+  section   Section    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progress  Progress[]
+}
+
+model Enrollment {
+  id         String   @id @default(uuid())
+  enrolledAt DateTime @default(now())
+
+  // Relations
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model Progress {
+  id          String    @id @default(uuid())
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  // Relations
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
