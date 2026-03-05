@@ -46,10 +46,28 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Hugging Face API Error:", error)
     
+    // Check if it's an authentication error
+    let errorMessage = "Failed to get response from AI"
+    let errorDetails = error instanceof Error ? error.message : "Unknown error"
+    
+    if (!process.env.HUGGINGFACE_API_KEY) {
+      console.error("API Key is missing from environment variables")
+      errorMessage = "Hugging Face API key is not configured"
+    } else if (errorDetails.includes("401") || errorDetails.includes("Unauthorized")) {
+      console.error("Invalid API key - check your Hugging Face token")
+      errorMessage = "Invalid Hugging Face API key"
+    } else if (errorDetails.includes("429")) {
+      console.error("Rate limit exceeded")
+      errorMessage = "Too many requests. Please wait a moment and try again."
+    } else if (errorDetails.includes("503")) {
+      console.error("Model unavailable")
+      errorMessage = "AI model is temporarily unavailable. Please try again in a few moments."
+    }
+    
     return NextResponse.json(
       { 
-        error: "Failed to get response from AI",
-        details: error instanceof Error ? error.message : "Unknown error"
+        error: errorMessage,
+        details: errorDetails
       },
       { status: 500 }
     )
