@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import SectionManager from "@/components/course/SectionManager"
 
-export default async function EditCoursePage({ params }: { params: { courseId: string } }) {
+export default async function EditCoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -16,8 +16,10 @@ export default async function EditCoursePage({ params }: { params: { courseId: s
     redirect("/courses")
   }
 
+  const { courseId } = await params
+
   const course = await prisma.course.findUnique({
-    where: { id: params.courseId },
+    where: { id: courseId },
     include: {
       sections: {
         include: { lessons: true },

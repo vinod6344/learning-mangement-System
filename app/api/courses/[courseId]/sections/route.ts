@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 
 export async function POST(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -18,7 +18,7 @@ export async function POST(
       return NextResponse.json({ message: "Only instructors can add sections" }, { status: 403 })
     }
 
-    const { courseId } = params
+    const { courseId } = await params
     const { title } = await req.json()
 
     if (!title) {
@@ -61,10 +61,10 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const { courseId } = params
+    const { courseId } = await params
 
     const sections = await prisma.section.findMany({
       where: { courseId },

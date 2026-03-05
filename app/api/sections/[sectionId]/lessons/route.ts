@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 
 export async function POST(
   req: Request,
-  { params }: { params: { sectionId: string } }
+  { params }: { params: Promise<{ sectionId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -18,7 +18,7 @@ export async function POST(
       return NextResponse.json({ message: "Only instructors can add lessons" }, { status: 403 })
     }
 
-    const { sectionId } = params
+    const { sectionId } = await params
     const { title, youtubeUrl, duration } = await req.json()
 
     if (!title || !youtubeUrl) {
@@ -64,10 +64,10 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { sectionId: string } }
+  { params }: { params: Promise<{ sectionId: string }> }
 ) {
   try {
-    const { sectionId } = params
+    const { sectionId } = await params
 
     const lessons = await prisma.lesson.findMany({
       where: { sectionId: parseInt(sectionId) },
