@@ -4,8 +4,11 @@ import { prisma } from '../lib/prisma'
 async function main() {
   // Create instructor
   const instructorPassword = await bcrypt.hash('password123', 10)
-  const instructor = await prisma.user.create({
-    data: {
+  
+  const instructor = await prisma.user.upsert({
+    where: { email: 'instructor@example.com' },
+    update: {},
+    create: {
       email: 'instructor@example.com',
       name: 'John Instructor',
       password: instructorPassword,
@@ -15,8 +18,11 @@ async function main() {
 
   // Create student
   const studentPassword = await bcrypt.hash('password123', 10)
-  const student = await prisma.user.create({
-    data: {
+  
+  const student = await prisma.user.upsert({
+    where: { email: 'student@example.com' },
+    update: {},
+    create: {
       email: 'student@example.com',
       name: 'Jane Student',
       password: studentPassword,
