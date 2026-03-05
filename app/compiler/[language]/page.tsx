@@ -1,80 +1,59 @@
 "use client"
 
 import { useState } from "react"
-import { notFound } from "next/navigation"
+import { useParams } from "next/navigation"
 
-interface CompilerPageProps {
-  params: Promise<{ language: string }>
+const languages: Record<string, { name: string; icon: string; bgColor: string; sampleCode: string }> = {
+  java: { 
+    name: 'Java', 
+    icon: '☕', 
+    bgColor: 'bg-orange-600',
+    sampleCode: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}`
+  },
+  c: { 
+    name: 'C', 
+    icon: '🔧', 
+    bgColor: 'bg-blue-600',
+    sampleCode: `#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}`
+  },
+  cpp: { 
+    name: 'C++', 
+    icon: '⚡', 
+    bgColor: 'bg-indigo-600',
+    sampleCode: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello, World!" << endl;\n    return 0;\n}`
+  },
+  python: { 
+    name: 'Python', 
+    icon: '🐍', 
+    bgColor: 'bg-yellow-600',
+    sampleCode: `print("Hello, World!")`
+  },
 }
 
-export default function CompilerPage({ params }: CompilerPageProps) {
-  const [language, setLanguage] = useState<string>("")
+export default function CompilerPage() {
+  const params = useParams()
+  const language = params.language as string
   const [code, setCode] = useState("")
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
 
-  // Wait for params on client side
-  if (typeof window !== 'undefined' && !language) {
-    params.then(p => setLanguage(p.language))
-  }
-  
-  const languages: Record<string, { name: string; color: string; icon: string; bgColor: string; sampleCode: string }> = {
-    java: { 
-      name: 'Java', 
-      color: 'text-orange-500', 
-      icon: '☕', 
-      bgColor: 'bg-orange-600',
-      sampleCode: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-    }
-}`
-    },
-    c: { 
-      name: 'C', 
-      color: 'text-blue-500', 
-      icon: '🔧', 
-      bgColor: 'bg-blue-600',
-      sampleCode: `#include <stdio.h>
-
-int main() {
-    printf("Hello, World!\\n");
-    return 0;
-}`
-    },
-    cpp: { 
-      name: 'C++', 
-      color: 'text-indigo-500', 
-      icon: '⚡', 
-      bgColor: 'bg-indigo-600',
-      sampleCode: `#include <iostream>
-using namespace std;
-
-int main() {
-    cout << "Hello, World!" << endl;
-    return 0;
-}`
-    },
-    python: { 
-      name: 'Python', 
-      color: 'text-yellow-500', 
-      icon: '🐍', 
-      bgColor: 'bg-yellow-600',
-      sampleCode: `print("Hello, World!")`
-    },
-  }
-
   const lang = languages[language]
   
   if (!lang) {
-    notFound()
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">404</h1>
+          <p className="text-xl text-gray-400">Language not found</p>
+        </div>
+      </div>
+    )
   }
 
   const handleRun = async () => {
     setIsRunning(true)
     setOutput("Compiling and running...\n")
     
-    // Simulate compilation/execution delay
     setTimeout(() => {
       setOutput(`Output:\n${lang.name} code executed successfully!\n\nNote: This is a demo. To actually execute code, integrate with a backend compiler API like Judge0 or Piston.`)
       setIsRunning(false)
@@ -119,7 +98,6 @@ int main() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
-          {/* Code Editor */}
           <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
             <div className={`${lang.bgColor} px-4 py-2 font-semibold flex justify-between items-center`}>
               <span>Editor</span>
@@ -139,7 +117,6 @@ int main() {
             />
           </div>
 
-          {/* Output Console */}
           <div className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
             <div className="bg-gray-700 px-4 py-2 font-semibold">
               Output Console
@@ -150,7 +127,6 @@ int main() {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="mt-6 flex gap-3">
           <button 
             onClick={handleRun}
@@ -166,9 +142,7 @@ int main() {
                 Running...
               </>
             ) : (
-              <>
-                ▶ Run Code
-              </>
+              <>▶ Run Code</>
             )}
           </button>
           <button 
