@@ -36,6 +36,7 @@ interface Course {
   description: string
   thumbnail: string | null
   category: string
+  price?: number | null
   createdAt: string
   updatedAt: string
   instructorId: string
