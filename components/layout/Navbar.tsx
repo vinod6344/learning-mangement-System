@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import ProfileDropdown from "./ProfileDropdown"
+import CompilerToggle from "./CompilerToggle"
 
 interface NavbarProps {
   user: {
@@ -37,7 +38,8 @@ export default function Navbar({ user }: NavbarProps) {
               )}
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <CompilerToggle />
             <ProfileDropdown />
           </div>
         </div>
